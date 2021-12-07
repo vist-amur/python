@@ -86,7 +86,7 @@ class funcSpider():
                 z.extractall()
                 pFiles = os.listdir(self.pCatalogLoad + r'\temp')
                 for s in pFiles:
-                    if s[::-3] == 'xml':
+                    if s[-3::] == 'xml':
                         pdoc = minidom.parse(s)
                         items = pdoc.getElementsByTagName('postAddress')
 
