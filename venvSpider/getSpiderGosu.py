@@ -4,20 +4,21 @@ from datetime import datetime, timedelta
 import zipfile
 from xml.dom import minidom
 
-class funcSpider():
-    def __init__(self, pLocation, pLogin, pPass, pCatalogLoad):
-        self.pLocation = pLocation
-        self.pLogin = pLogin
-        self.pPass = pPass
-        self.pCatalogLoad = pCatalogLoad
 
-    def pingLocation(self):
+class FuncSpider:
+    def __init__(self, p_location, p_login, p_pass, p_catalog_load):
+        self.pLocation = p_location
+        self.pLogin = p_login
+        self.pPass = p_pass
+        self.pCatalogLoad = p_catalog_load
+
+    def ping_location(self):
         try:
             ftp = FTP()
-            HOST = self.pLocation
-            PORT = 21
+            host = self.pLocation
+            port = 21
 
-            ftp.connect(HOST, PORT)
+            ftp.connect(host, port)
             ftp.login(self.pLogin, self.pPass)
             ftp.quit()
             ftp.close()
@@ -25,7 +26,7 @@ class funcSpider():
         except:
             return False
 
-    def startFTP(self):
+    def start_ftp(self):
         try:
             ftp = FTP()
             HOST = self.pLocation
@@ -37,69 +38,68 @@ class funcSpider():
         except:
             return False
 
-    def getListRegions43FZ(self):
-        pFTP = self.startFTP()
-        if not pFTP:
+    def get_list_regions43_fz(self):
+        p_ftp = self.start_ftp()
+        if not p_ftp:
             return []
-        pFTP.sendcmd('CWD fcs_regions')
-        pRegList = []
-        #print(pFTP.retrlines('LIST'))
+        p_ftp.sendcmd('CWD fcs_regions')
+        p_reg_list = []
+        # print(p_ftp.retrlines('LIST'))
         # with open(self.pCatalogLoad + r'\regions.txt', 'wb') as f:
-        pFTP.retrbinary("RETR regions.txt", pRegList.append)
-        pFTP.quit()
-        pFTP.close()
-        return pRegList
+        p_ftp.retrbinary("RETR regions.txt", p_reg_list.append)
+        p_ftp.quit()
+        p_ftp.close()
+        return p_reg_list
 
-    def goToTheCatalogs(self, pList):
-        for x in pList:
+    def go_to_the_catalogs(self, p_list):
+        for x in p_list:
             a = x.decode('UTF-8')
-            aSPL = a.split()
+            a_spl = a.split()
 
-        pFTP = self.startFTP()
-        if not pFTP:
+        p_ftp = self.start_ftp()
+        if not p_ftp:
             return []
-        pFTP.sendcmd('CWD fcs_regions')
-        for x in aSPL:
-            pFTP.sendcmd(f'CWD {x}')
-            pRegList = []
-            pFTP.sendcmd(f'CWD notifications/currMonth')
-            p_zip = pFTP.nlst()
-            dateP = datetime.now()
-            dateMinus = datetime.now() - timedelta(1)
-            date2 = dateP.strftime("%Y%m%d")
-            dateMinus = dateMinus.strftime("%Y%m%d_")
-            dateTotal = dateMinus + date2
+        p_ftp.sendcmd('CWD fcs_regions')
+        for x in a_spl:
+            p_ftp.sendcmd(f'CWD {x}')
+            p_reg_list = []
+            p_ftp.sendcmd(f'CWD notifications/currMonth')
+            p_zip = p_ftp.nlst()
+            date_p = datetime.now()
+            date_minus = datetime.now() - timedelta(1)
+            date2 = date_p.strftime("%Y%m%d")
+            date_minus = date_minus.strftime("%Y%m%d_")
+            date_total = date_minus + date2
 
             list_downloads = [x for x in p_zip if x.find(date2) > 0]
-            #print(pFTP.retrlines('LIST'))
+            # print(p_ftp.retrlines('LIST'))
             # with open(self.pCatalogLoad + r'\regions.txt', 'wb') as f:
             for x in list_downloads:
                 with open(self.pCatalogLoad + fr'\{x}', 'wb') as f:
-                    pFTP.retrbinary(f"RETR {x}", f.write)
-            pFTP.cwd('/fcs_regions')
+                    p_ftp.retrbinary(f"RETR {x}", f.write)
+            p_ftp.cwd('/fcs_regions')
 
             os.chdir(self.pCatalogLoad + r'\temp')
 
             for x in list_downloads:
-                pZipFile = self.pCatalogLoad + fr'\{x}'
-                z = zipfile.ZipFile(pZipFile, 'r')
+                p_zip_file = self.pCatalogLoad + fr'\{x}'
+                z = zipfile.ZipFile(p_zip_file, 'r')
                 z.extractall()
-                pFiles = os.listdir(self.pCatalogLoad + r'\temp')
-                for s in pFiles:
+                p_files = os.listdir(self.pCatalogLoad + r'\temp')
+                for s in p_files:
                     if s[-3::] == 'xml':
                         pdoc = minidom.parse(s)
                         items = pdoc.getElementsByTagName('placingWay')
                         if len(items) == 0:
                             continue
 
+        p_ftp.quit()
+        p_ftp.close()
 
-        pFTP.quit()
-        pFTP.close()
-
-        return aSPL
+        return a_spl
 
 
-g = funcSpider('ftp.zakupki.gov.ru', 'free', 'free', r'C:\ftpload')
+g = FuncSpider('ftp.zakupki.gov.ru', 'free', 'free', r'C:\ftpload')
 
-pL = g.getListRegions43FZ()
-g.goToTheCatalogs(pL)
+pL = g.get_list_regions43_fz()
+g.go_to_the_catalogs(pL)
