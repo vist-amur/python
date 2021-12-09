@@ -63,24 +63,24 @@ class funcSpider():
             pFTP.sendcmd(f'CWD {x}')
             pRegList = []
             pFTP.sendcmd(f'CWD notifications/currMonth')
-            pLzip = pFTP.nlst()
+            p_zip = pFTP.nlst()
             dateP = datetime.now()
             dateMinus = datetime.now() - timedelta(1)
             date2 = dateP.strftime("%Y%m%d")
             dateMinus = dateMinus.strftime("%Y%m%d_")
             dateTotal = dateMinus + date2
 
-            listDownloads = [x for x in pLzip if x.find(date2) > 0]
+            list_downloads = [x for x in p_zip if x.find(date2) > 0]
             #print(pFTP.retrlines('LIST'))
             # with open(self.pCatalogLoad + r'\regions.txt', 'wb') as f:
-            for x in listDownloads:
+            for x in list_downloads:
                 with open(self.pCatalogLoad + fr'\{x}', 'wb') as f:
                     pFTP.retrbinary(f"RETR {x}", f.write)
             pFTP.cwd('/fcs_regions')
 
             os.chdir(self.pCatalogLoad + r'\temp')
 
-            for x in listDownloads:
+            for x in list_downloads:
                 pZipFile = self.pCatalogLoad + fr'\{x}'
                 z = zipfile.ZipFile(pZipFile, 'r')
                 z.extractall()
@@ -88,7 +88,10 @@ class funcSpider():
                 for s in pFiles:
                     if s[-3::] == 'xml':
                         pdoc = minidom.parse(s)
-                        items = pdoc.getElementsByTagName('postAddress')
+                        items = pdoc.getElementsByTagName('placingWay')
+                        if len(items) == 0:
+                            continue
+
 
         pFTP.quit()
         pFTP.close()
