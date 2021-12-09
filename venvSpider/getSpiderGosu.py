@@ -62,7 +62,7 @@ class FuncSpider:
         p_ftp.sendcmd('CWD fcs_regions')
         for x in a_spl:
             p_ftp.sendcmd(f'CWD {x}')
-            p_reg_list = []
+            p_reg_list = {}
             p_ftp.sendcmd(f'CWD notifications/currMonth')
             p_zip = p_ftp.nlst()
             date_p = datetime.now()
@@ -88,10 +88,169 @@ class FuncSpider:
                 p_files = os.listdir(self.pCatalogLoad + r'\temp')
                 for s in p_files:
                     if s[-3::] == 'xml':
+                        if s.find('Clarification') > -1:
+                            continue
+                        if s.find('Cancel') > -1:
+                            continue
                         pdoc = minidom.parse(s)
                         items = pdoc.getElementsByTagName('placingWay')
                         if len(items) == 0:
                             continue
+                        p_reg_list['дата_создания'] = str(datetime.today())
+                        p_reg_list['тип_фз'] = 'ET44'
+
+                        # tag placingWay - start
+                        items = pdoc.getElementsByTagName('placingWay')
+                        for el in items:
+                            name_obj = el.getElementsByTagName("name")[0]
+                        for xi in range(0, 1):
+                            nodes = name_obj.childNodes
+                            for node in nodes:
+                                if node.nodeType == node.TEXT_NODE:
+                                    p_reg_list['тип_фз'] = node.data
+                        if 'тип_фз' not in p_reg_list:
+                            p_reg_list['тип_фз'] = ''
+                        # finish
+
+                        # tag PublishDate - start
+                        items = pdoc.getElementsByTagName('plannedPublishDate')
+                        for el in items:
+                            name_obj = el.getElementsByTagName("name")[0]
+                        if len(items) > 0:
+                            for xi in range(0, 1):
+                                nodes = name_obj.childNodes
+                                for node in nodes:
+                                    if node.nodeType == node.TEXT_NODE:
+                                        p_reg_list['дата_размещения'] = node.data
+                        if 'дата_размещения' not in p_reg_list:
+                            items = pdoc.getElementsByTagName('docPublishDate')
+                            if len(items) > 0:
+                                for name_obj in items:
+                                    nodes = name_obj.childNodes
+                                    for node in nodes:
+                                        if node.nodeType == node.TEXT_NODE:
+                                            p_reg_list['дата_размещения'] = node.data
+                        if 'дата_размещения' not in p_reg_list:
+                            p_reg_list['дата_размещения'] = ''
+                        # finish
+
+                        # tag endDT - start
+                        items = pdoc.getElementsByTagName('endDT')
+                        if len(items) > 0:
+                            for name_obj in items:
+                                nodes = name_obj.childNodes
+                                for node in nodes:
+                                    if node.nodeType == node.TEXT_NODE:
+                                        p_reg_list['дата_окончания'] = node.data
+
+                        if 'дата_окончания' not in p_reg_list:
+                            items = pdoc.getElementsByTagName('endDate')
+                            if len(items) > 0:
+                                for name_obj in items:
+                                    nodes = name_obj.childNodes
+                                    for node in nodes:
+                                        if node.nodeType == node.TEXT_NODE:
+                                            p_reg_list['дата_окончания'] = node.data
+                        if 'дата_окончания' not in p_reg_list:
+                            p_reg_list['дата_окончания'] = ''
+                        # finish
+
+                        # tag purchaseNumber - start
+                        items = pdoc.getElementsByTagName('purchaseNumber')
+                        if len(items) > 0:
+                            for name_obj in items:
+                                nodes = name_obj.childNodes
+                                for node in nodes:
+                                    if node.nodeType == node.TEXT_NODE:
+                                        p_reg_list['номер_извещения'] = node.data
+                                break
+
+
+                        if 'номер_извещения' not in p_reg_list:
+                            p_reg_list['номер_извещения'] = ''
+                        # finish
+
+                        # tag href - start
+                        items = pdoc.getElementsByTagName('href')
+                        if len(items) > 0:
+                            for name_obj in items:
+                                nodes = name_obj.childNodes
+                                for node in nodes:
+                                    if node.nodeType == node.TEXT_NODE:
+                                        p_reg_list['ссылка_на_сайт'] = node.data
+
+                        if 'ссылка_на_сайт' not in p_reg_list:
+                            p_reg_list['ссылка_на_сайт'] = ''
+                        # finish
+
+                        # tag purchaseObjectInfo - start
+                        items = pdoc.getElementsByTagName('purchaseObjectInfo')
+                        if len(items) > 0:
+                            for name_obj in items:
+                                nodes = name_obj.childNodes
+                                for node in nodes:
+                                    if node.nodeType == node.TEXT_NODE:
+                                        p_reg_list['объект_закупки'] = node.data
+
+                        if 'объект_закупки' not in p_reg_list:
+                            p_reg_list['объект_закупки'] = ''
+                        # finish
+
+                        # tag PostAddress - start
+                        items = pdoc.getElementsByTagName('orgPostAddress')
+                        if len(items) > 0:
+                            for name_obj in items:
+                                nodes = name_obj.childNodes
+                                for node in nodes:
+                                    if node.nodeType == node.TEXT_NODE:
+                                        p_reg_list['арес_заказчика'] = node.data
+
+                        if 'арес_заказчика' not in p_reg_list:
+                            items = pdoc.getElementsByTagName('postAddress')
+                            if len(items) > 0:
+                                for name_obj in items:
+                                    nodes = name_obj.childNodes
+                                    for node in nodes:
+                                        if node.nodeType == node.TEXT_NODE:
+                                            p_reg_list['арес_заказчика'] = node.data
+                        if 'арес_заказчика' not in p_reg_list:
+                            p_reg_list['арес_заказчика'] = ''
+                        # finish
+
+                        # tag fullName - start
+                        items = pdoc.getElementsByTagName('fullName')
+                        if len(items) > 0:
+                            for name_obj in items:
+                                nodes = name_obj.childNodes
+                                for node in nodes:
+                                    if node.nodeType == node.TEXT_NODE:
+                                        p_reg_list['заказчик'] = node.data
+                                break
+
+                        if 'заказчик' not in p_reg_list:
+                            p_reg_list['заказчик'] = ''
+                        # finish
+
+                        # tag maxPrice - start
+                        items = pdoc.getElementsByTagName('maxPrice')
+                        if len(items) > 0:
+                            for name_obj in items:
+                                nodes = name_obj.childNodes
+                                for node in nodes:
+                                    if node.nodeType == node.TEXT_NODE:
+                                        p_reg_list['начальная_цена'] = node.data
+                                break
+
+                        if 'начальная_цена' not in p_reg_list:
+                            p_reg_list['начальная_цена'] = ''
+                        # finish
+
+                        if len(items) > 0:
+                            p_reg_list['тип_фз'] = items[0]
+                        else:
+                            p_reg_list['тип_фз'] = ''
+
+
 
         p_ftp.quit()
         p_ftp.close()
