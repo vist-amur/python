@@ -3,6 +3,7 @@ from ftplib import FTP
 from datetime import datetime, timedelta
 import zipfile
 from xml.dom import minidom
+from pathlib import Path
 
 
 class FuncSpider:
@@ -52,6 +53,7 @@ class FuncSpider:
         return p_reg_list
 
     def go_to_the_catalogs(self, p_list):
+        total_list_to_sql = []
         for x in p_list:
             a = x.decode('UTF-8')
             a_spl = a.split()
@@ -62,12 +64,11 @@ class FuncSpider:
         p_ftp.sendcmd('CWD fcs_regions')
         for x in a_spl:
             p_ftp.sendcmd(f'CWD {x}')
-            p_reg_list = {}
             p_ftp.sendcmd(f'CWD notifications/currMonth')
             p_zip = p_ftp.nlst()
             date_p = datetime.now()
             date_minus = datetime.now() - timedelta(1)
-            date2 = date_p.strftime("%Y%m%d")
+            date2 = date_minus.strftime("%Y%m%d")
             date_minus = date_minus.strftime("%Y%m%d_")
             date_total = date_minus + date2
 
@@ -86,44 +87,63 @@ class FuncSpider:
                 z = zipfile.ZipFile(p_zip_file, 'r')
                 z.extractall()
                 p_files = os.listdir(self.pCatalogLoad + r'\temp')
+
                 for s in p_files:
+
                     if s[-3::] == 'xml':
                         if s.find('Clarification') > -1:
                             continue
                         if s.find('Cancel') > -1:
                             continue
+                        p_reg_list = {}
+                        p_ntag = ''
+                        p_natrr = ''
                         pdoc = minidom.parse(s)
-                        items = pdoc.getElementsByTagName('placingWay')
-                        if len(items) == 0:
-                            continue
+                        # items = pdoc.getElementsByTagName('placingWay')
+                        # if len(items) == 0:
+                        #    continue
                         p_reg_list['дата_создания'] = str(datetime.today())
                         p_reg_list['тип_фз'] = 'ET44'
 
                         # tag placingWay - start
                         items = pdoc.getElementsByTagName('placingWay')
-                        for el in items:
-                            name_obj = el.getElementsByTagName("name")[0]
-                        for xi in range(0, 1):
-                            nodes = name_obj.childNodes
-                            for node in nodes:
-                                if node.nodeType == node.TEXT_NODE:
-                                    p_reg_list['тип_фз'] = node.data
+                        if len(items) > 0:
+                            for el in items:
+                                name_obj = el.getElementsByTagName("name")[0]
+                            for xi in range(0, 1):
+                                nodes = name_obj.childNodes
+                                for node in nodes:
+                                    if node.nodeType == node.TEXT_NODE:
+                                        p_reg_list['тип_фз'] = node.data
+                        else:
+                            items = pdoc.getElementsByTagName('ns9:placingWay')
+                            if len(items) > 0:
+                                p_ntag = 'ns9:'
+                                p_natrr = 'ns4:'
+                                for el in items:
+                                    name_obj = el.getElementsByTagName("ns4:name")[0]
+                                for xi in range(0, 1):
+                                    nodes = name_obj.childNodes
+                                    for node in nodes:
+                                        if node.nodeType == node.TEXT_NODE:
+                                            p_reg_list['тип_фз'] = node.data
+
                         if 'тип_фз' not in p_reg_list:
                             p_reg_list['тип_фз'] = ''
                         # finish
 
                         # tag PublishDate - start
-                        items = pdoc.getElementsByTagName('plannedPublishDate')
-                        for el in items:
-                            name_obj = el.getElementsByTagName("name")[0]
+                        items = pdoc.getElementsByTagName(p_ntag + 'plannedPublishDate')
+                        #for el in items:
+                        #    name_obj = el.getElementsByTagName(p_natrr + "name")[0]
                         if len(items) > 0:
-                            for xi in range(0, 1):
+                            for name_obj in items:
                                 nodes = name_obj.childNodes
                                 for node in nodes:
                                     if node.nodeType == node.TEXT_NODE:
                                         p_reg_list['дата_размещения'] = node.data
                         if 'дата_размещения' not in p_reg_list:
-                            items = pdoc.getElementsByTagName('docPublishDate')
+                            items = pdoc.getElementsByTagName(p_ntag + 'docPublishDate')
                             if len(items) > 0:
                                 for name_obj in items:
                                     nodes = name_obj.childNodes
@@ -135,7 +155,7 @@ class FuncSpider:
                         # finish
 
                         # tag endDT - start
-                        items = pdoc.getElementsByTagName('endDT')
+                        items = pdoc.getElementsByTagName(p_ntag + 'endDT')
                         if len(items) > 0:
                             for name_obj in items:
                                 nodes = name_obj.childNodes
@@ -144,7 +164,7 @@ class FuncSpider:
                                         p_reg_list['дата_окончания'] = node.data
 
                         if 'дата_окончания' not in p_reg_list:
-                            items = pdoc.getElementsByTagName('endDate')
+                            items = pdoc.getElementsByTagName(p_ntag + 'endDate')
                             if len(items) > 0:
                                 for name_obj in items:
                                     nodes = name_obj.childNodes
@@ -156,7 +176,7 @@ class FuncSpider:
                         # finish
 
                         # tag purchaseNumber - start
-                        items = pdoc.getElementsByTagName('purchaseNumber')
+                        items = pdoc.getElementsByTagName(p_ntag + 'purchaseNumber')
                         if len(items) > 0:
                             for name_obj in items:
                                 nodes = name_obj.childNodes
@@ -165,13 +185,12 @@ class FuncSpider:
                                         p_reg_list['номер_извещения'] = node.data
                                 break
 
-
                         if 'номер_извещения' not in p_reg_list:
                             p_reg_list['номер_извещения'] = ''
                         # finish
 
                         # tag href - start
-                        items = pdoc.getElementsByTagName('href')
+                        items = pdoc.getElementsByTagName(p_ntag + 'href')
                         if len(items) > 0:
                             for name_obj in items:
                                 nodes = name_obj.childNodes
@@ -184,7 +203,7 @@ class FuncSpider:
                         # finish
 
                         # tag purchaseObjectInfo - start
-                        items = pdoc.getElementsByTagName('purchaseObjectInfo')
+                        items = pdoc.getElementsByTagName(p_ntag + 'purchaseObjectInfo')
                         if len(items) > 0:
                             for name_obj in items:
                                 nodes = name_obj.childNodes
@@ -197,7 +216,7 @@ class FuncSpider:
                         # finish
 
                         # tag PostAddress - start
-                        items = pdoc.getElementsByTagName('orgPostAddress')
+                        items = pdoc.getElementsByTagName(p_ntag + 'orgPostAddress')
                         if len(items) > 0:
                             for name_obj in items:
                                 nodes = name_obj.childNodes
@@ -206,7 +225,7 @@ class FuncSpider:
                                         p_reg_list['арес_заказчика'] = node.data
 
                         if 'арес_заказчика' not in p_reg_list:
-                            items = pdoc.getElementsByTagName('postAddress')
+                            items = pdoc.getElementsByTagName(p_ntag + 'postAddress')
                             if len(items) > 0:
                                 for name_obj in items:
                                     nodes = name_obj.childNodes
@@ -218,7 +237,7 @@ class FuncSpider:
                         # finish
 
                         # tag fullName - start
-                        items = pdoc.getElementsByTagName('fullName')
+                        items = pdoc.getElementsByTagName(p_ntag + 'fullName')
                         if len(items) > 0:
                             for name_obj in items:
                                 nodes = name_obj.childNodes
@@ -232,7 +251,7 @@ class FuncSpider:
                         # finish
 
                         # tag maxPrice - start
-                        items = pdoc.getElementsByTagName('maxPrice')
+                        items = pdoc.getElementsByTagName(p_ntag + 'maxPrice')
                         if len(items) > 0:
                             for name_obj in items:
                                 nodes = name_obj.childNodes
@@ -245,12 +264,16 @@ class FuncSpider:
                             p_reg_list['начальная_цена'] = ''
                         # finish
 
-                        if len(items) > 0:
-                            p_reg_list['тип_фз'] = items[0]
-                        else:
-                            p_reg_list['тип_фз'] = ''
-
-
+                        total_list_to_sql.append(p_reg_list)
+                path = Path(self.pCatalogLoad + r'\temp')
+                for p in path.glob('*.xml'):
+                    p.unlink()
+                for p in path.glob('*.sig'):
+                    p.unlink()
+            z.close()
+            path = Path(self.pCatalogLoad)
+            for p in path.glob('*.zip'):
+                p.unlink()
 
         p_ftp.quit()
         p_ftp.close()
