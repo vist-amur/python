@@ -1,9 +1,11 @@
 import os
+import sys
 from ftplib import FTP
 from datetime import datetime, timedelta
 import zipfile
 from xml.dom import minidom
 from pathlib import Path
+import pymysql
 
 
 class FuncSpider:
@@ -134,7 +136,7 @@ class FuncSpider:
 
                         # tag PublishDate - start
                         items = pdoc.getElementsByTagName(p_ntag + 'plannedPublishDate')
-                        #for el in items:
+                        # for el in items:
                         #    name_obj = el.getElementsByTagName(p_natrr + "name")[0]
                         if len(items) > 0:
                             for name_obj in items:
@@ -278,10 +280,55 @@ class FuncSpider:
         p_ftp.quit()
         p_ftp.close()
 
-        return a_spl
+        return total_list_to_sql
 
 
-g = FuncSpider('ftp.zakupki.gov.ru', 'free', 'free', r'C:\ftpload')
+def main(inner=False):
+    if len(sys.argv) == 0:
+        print('Parametres not found!')
+        return False
+    # Разбор параметров
+    # 1.FTP сайта госзакупок; 2.Логин; 3. Пароль; 4. Временный каталог для распаковки скачанных архивов
+    # 5.Адрес БД; 6.Пользователь БД; 7.Пароль пользователя БД; 8.Имя БД; 9.Имя таблицы извещений
+    if inner:
+        #g = FuncSpider('ftp.zakupki.gov.ru', 'free', 'free', r'C:\ftpload')
 
-pL = g.get_list_regions43_fz()
-g.go_to_the_catalogs(pL)
+        #pL = g.get_list_regions43_fz()
+        #p_list_notifications = g.go_to_the_catalogs(pL)
+        p_list_notifications = [{'дата_создания': '2021-12-10 15:15:52.030514', 'тип_фз': 'Электронный аукцион',
+                                 'дата_размещения': '2021-12-08T16:28:48.649+07:00',
+                                 'дата_окончания': '2021-12-16T23:59:00+07:00',
+                                 'номер_извещения': '0177100001321000020',
+                                 'ссылка_на_сайт': 'https://zakupki.gov.ru/epz/order/notice/ea44/view/common-info.html?regNumber=0177100001321000020',
+                                 'объект_закупки': 'Подписка на периодические издания и услуги по доставке ',
+                                 'арес_заказчика': 'Российская Федерация, 649000, Алтай Респ, Горно-Алтайск г, Ленкина ул, 4',
+                                 'заказчик': 'АРБИТРАЖНЫЙ СУД РЕСПУБЛИКИ АЛТАЙ', 'начальная_цена': '123510.69'}]
+        connection = pymysql.connect(host="94.228.121.182", user="phpmyadmin", passwd="g7A1PuDN", database="goszakupki")
+        for x in p_list_notifications:
+            try:
+                cursor = connection.cursor()
+                niz = "'" + x["номер_извещения"] + "'"
+                sql = f'Select * from notifications where num_notification LIKE {niz}'
+                cursor.execute(sql)
+
+                oneRow = cursor.fetchone()
+
+                if oneRow == None:
+                    cursor = connection.cursor()
+                    sql = 'INSERT INTO notifications (date, type_fz, ' \
+                          'date_publish, date_finish, num_notification, ref, ' \
+                          'subject_purchase, customer, address_customer, price) ' \
+                          'VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
+                    cursor.execute(sql, (datetime.strptime(x["дата_создания"], '%Y-%m-%d %H:%M:%S.%f'), x["тип_фз"], datetime.strptime(x["дата_размещения"][0:10], '%Y-%m-%d'), datetime.strptime(x["дата_окончания"][0:10], '%Y-%m-%d'),
+                                         x["номер_извещения"], x["ссылка_на_сайт"], x["объект_закупки"], x["арес_заказчика"],
+                                         x["заказчик"], float(x["начальная_цена"])))
+                    connection.commit()
+            finally:
+                connection.close()
+
+        # for x in p_list_notifications:
+        # print(x)
+
+
+if __name__ == "__main__":
+    main(True)
