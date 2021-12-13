@@ -654,7 +654,7 @@ def main(inner=False):
         try:
             connection.close()
         except:
-            print('Connected was closed!')
+            print('Connected was closed!!!')
 
 if __name__ == "__main__":
     main(True)
