@@ -626,7 +626,7 @@ def main(inner=False):
                 #with open(r'D:\trace.txt', 'a') as fp:
                 #    traceback.print_exc(file=fp)
                     # повторный вызов исключения, если это необходимо.
-                #raise
+                raise
                 break
 
         try:
@@ -639,10 +639,10 @@ def main(inner=False):
         del  connection
     # 223-ФЗ
     if inner:
-        g = FuncSpider('ftp.zakupki.gov.ru', 'fz223free', 'fz223free', r'C:\ftpload')
+        g = FuncSpider(p_ftp223, p_login223, p_pass223, fr'{p_catalog}')
 
         pL = g.get_list_regions223_fz()
-        p_list_notifications = g.go_to_the_catalogs223fz(pL, g.get_list_catalog_regions223_fz())
+        p_list_notifications = g.go_to_the_catalogs223fz(pL, g.get_list_catalog_regions223_fz(), p_temp)
         print(len(p_list_notifications))
         #p_list_notifications = [{'дата_создания': '2021-12-10 15:15:52.030514', 'тип_фз': 'Электронный аукцион',
         #                     'дата_размещения': '2021-12-08T16:28:48.649+07:00',
@@ -652,19 +652,19 @@ def main(inner=False):
         #                         'объект_закупки': 'Подписка на периодические издания и услуги по доставке ',
         #                         'адрес_заказчика': 'Российская Федерация, 649000, Алтай Респ, Горно-Алтайск г, Ленкина ул, 4',
         #                         'заказчик': 'АРБИТРАЖНЫЙ СУД РЕСПУБЛИКИ АЛТАЙ', 'начальная_цена': '123510.69'}]
-        connection = pymysql.connect(host="94.228.121.182", user="phpmyadmin", passwd="g7A1PuDN", database="goszakupki")
+        connection = pymysql.connect(host=p_addressDB, user=p_loginDB, passwd=p_passDB, database=p_nameDB)
         for x in p_list_notifications:
             try:
                 cursor = connection.cursor()
                 niz = x["номер_извещения"]
-                sql = f"Select * from notifications where num_notification LIKE '{niz}'"
+                sql = f"Select * from {p_nametable} where num_notification LIKE '{niz}'"
                 cursor.execute(sql)
 
                 oneRow = cursor.fetchone()
 
                 if oneRow == None:
                     cursor = connection.cursor()
-                    sql = 'INSERT INTO notifications (date, fz, region, type_fz, ' \
+                    sql = f'INSERT INTO {p_nametable} (date, fz, region, type_fz, ' \
                           'date_publish, date_finish, num_notification, ref, ' \
                           'subject_purchase, customer, address_customer, price) ' \
                           'VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
@@ -674,8 +674,8 @@ def main(inner=False):
                     connection.commit()
             except:
                 connection.close()
-                with open(r'D:\trace.txt', 'a') as fp:
-                    traceback.print_exc(file=fp)
+                #with open(r'D:\trace.txt', 'a') as fp:
+                #    traceback.print_exc(file=fp)
                     # повторный вызов исключения, если это необходимо.
                 raise
                 break
