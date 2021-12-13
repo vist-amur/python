@@ -310,7 +310,7 @@ class FuncSpider:
             for p in path.glob('*.zip'):
                 p.unlink()
 
-        p_ftp.quit()
+        #p_ftp.quit()
         p_ftp.close()
 
         return total_list_to_sql
@@ -545,7 +545,7 @@ class FuncSpider:
             for p in path.glob('*.zip'):
                 p.unlink()
 
-        p_ftp.quit()
+        #p_ftp.quit()
         p_ftp.close()
 
         return total_list_to_sql
