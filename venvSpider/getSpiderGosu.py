@@ -552,9 +552,6 @@ class FuncSpider:
 
 
 def main(inner=False):
-    if len(sys.argv) == 0:
-        print('Parametres not found!')
-        return False
     # Разбор параметров
     # 1.FTP сайта госзакупок; 2.Логин; 3. Пароль; 4. Временный каталог для распаковки скачанных архивов
     # 5.Адрес БД; 6.Пользователь БД; 7.Пароль пользователя БД; 8.Имя БД; 9.Имя таблицы извещений
@@ -657,4 +654,9 @@ def main(inner=False):
             print('Connected was closed!!!')
 
 if __name__ == "__main__":
-    main(True)
+    #if len(sys.argv) <= 1:
+    #    print('Parameters are not specified!')
+    #else:
+    #    main(True)
+    for x in sys.argv:
+        print(f'{x} \n')
