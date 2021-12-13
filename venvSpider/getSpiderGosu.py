@@ -7,6 +7,7 @@ from xml.dom import minidom
 from pathlib import Path
 import pymysql
 import traceback
+import platform
 
 
 class FuncSpider:
@@ -83,7 +84,13 @@ class FuncSpider:
         #p_ftp.close()
         return p_reg_list
 
-    def go_to_the_catalogs(self, p_list):
+    def go_to_the_catalogs(self, p_list,p_temp):
+        p_slash = ''
+        p_os = platform.system().lower()
+        if "win" in p_os:
+            p_slash = '\\'
+        else:
+            p_slash = '/'
         total_list_to_sql = []
         for x in p_list:
             a = x.decode('UTF-8')
@@ -107,17 +114,17 @@ class FuncSpider:
             # print(p_ftp.retrlines('LIST'))
             # with open(self.pCatalogLoad + r'\regions.txt', 'wb') as f:
             for x in list_downloads:
-                with open(self.pCatalogLoad + fr'\{x}', 'wb') as f:
+                with open(self.pCatalogLoad + fr'{p_slash}{x}', 'wb') as f:
                     p_ftp.retrbinary(f"RETR {x}", f.write)
             p_ftp.cwd('/fcs_regions')
 
-            os.chdir(self.pCatalogLoad + r'\temp')
+            os.chdir(self.pCatalogLoad + fr'{p_slash}{p_temp}')
 
             for x in list_downloads:
-                p_zip_file = self.pCatalogLoad + fr'\{x}'
+                p_zip_file = self.pCatalogLoad + fr'{p_slash}{x}'
                 z = zipfile.ZipFile(p_zip_file, 'r')
                 z.extractall()
-                p_files = os.listdir(self.pCatalogLoad + r'\temp')
+                p_files = os.listdir(self.pCatalogLoad + fr'{p_slash}{p_temp}')
 
                 for s in p_files:
 
@@ -300,7 +307,7 @@ class FuncSpider:
                         # finish
 
                         total_list_to_sql.append(p_reg_list)
-                path = Path(self.pCatalogLoad + r'\temp')
+                path = Path(self.pCatalogLoad + fr'{p_slash}{p_temp}')
                 for p in path.glob('*.xml'):
                     p.unlink()
                 for p in path.glob('*.sig'):
@@ -315,7 +322,13 @@ class FuncSpider:
 
         return total_list_to_sql
 
-    def go_to_the_catalogs223fz(self, p_list, p_catalog):
+    def go_to_the_catalogs223fz(self, p_list, p_catalog, p_temp):
+        p_slash = ''
+        p_os = platform.system().lower()
+        if "win" in p_os:
+            p_slash = '\\'
+        else:
+            p_slash = '/'
         total_list_to_sql = []
         for x in p_list:
             a = x.decode('UTF-8')
@@ -350,18 +363,18 @@ class FuncSpider:
                 # print(p_ftp.retrlines('LIST'))
                 # with open(self.pCatalogLoad + r'\regions.txt', 'wb') as f:
                 for x in list_downloads:
-                    with open(self.pCatalogLoad + fr'\{x}', 'wb') as f:
+                    with open(self.pCatalogLoad + fr'{p_slash}{x}', 'wb') as f:
                         p_ftp.retrbinary(f"RETR {x}", f.write)
 
                 p_ftp.cwd(f'/out/published/{xcat}')
 
-                os.chdir(self.pCatalogLoad + r'\temp')
+                os.chdir(self.pCatalogLoad + fr'{p_slash}{p_temp}')
 
                 for x in list_downloads:
-                    p_zip_file = self.pCatalogLoad + fr'\{x}'
+                    p_zip_file = self.pCatalogLoad + fr'{p_slash}{x}'
                     z = zipfile.ZipFile(p_zip_file, 'r')
                     z.extractall()
-                    p_files = os.listdir(self.pCatalogLoad + r'\temp')
+                    p_files = os.listdir(self.pCatalogLoad + fr'{p_slash}{p_temp}')
 
                     for s in p_files:
 
@@ -531,7 +544,7 @@ class FuncSpider:
                             # finish
 
                             total_list_to_sql.append(p_reg_list)
-                    path = Path(self.pCatalogLoad + r'\temp')
+                    path = Path(self.pCatalogLoad + fr'{p_slash}{p_temp}')
                     for p in path.glob('*.xml'):
                        p.unlink()
                     for p in path.glob('*.sig'):
@@ -550,16 +563,35 @@ class FuncSpider:
 
         return total_list_to_sql
 
+def decryption_of_parameters(self):
+    print('Разбор параметров '
+          '1.FTP сайта госзакупок; 2.Логин; 3. Пароль; 4.FTP сайта госзакупок 223; 5.Логин 223; 6. Пароль 223; 7. Временный каталог для распаковки скачанных архивов'
+          '8. Каталог для xml; 9.Адрес БД; 10.Пользователь БД; 11.Пароль пользователя БД; 12.Имя БД; 13.Имя таблицы извещений)')
 
 def main(inner=False):
     # Разбор параметров
-    # 1.FTP сайта госзакупок; 2.Логин; 3. Пароль; 4. Временный каталог для распаковки скачанных архивов
-    # 5.Адрес БД; 6.Пользователь БД; 7.Пароль пользователя БД; 8.Имя БД; 9.Имя таблицы извещений
+    # 1.FTP сайта госзакупок; 2.Логин; 3. Пароль; 4.FTP сайта госзакупок 223; 5.Логин 223; 6. Пароль 223; 7. Временный каталог для распаковки скачанных архивов
+    # 8. Каталог для xml; 9.Адрес БД; 10.Пользователь БД; 11.Пароль пользователя БД; 12.Имя БД; 13.Имя таблицы извещений
+    #
+    p_ftp44 = sys.argv[1]
+    p_login44 = sys.argv[2]
+    p_pass44 = sys.argv[3]
+    p_ftp223 = sys.argv[4]
+    p_login223 = sys.argv[5]
+    p_pass223 = sys.argv[6]
+    p_catalog = sys.argv[7]
+    p_temp = sys.argv[8]
+    p_addressDB = sys.argv[9]
+    p_loginDB = sys.argv[10]
+    p_passDB = sys.argv[11]
+    p_nameDB = sys.argv[12]
+    p_nametable = sys.argv[13]
+
     if inner:
-        g = FuncSpider('ftp.zakupki.gov.ru', 'free', 'free', r'C:\ftpload')
+        g = FuncSpider(p_ftp44, p_login44, p_pass44, fr'{p_catalog}')
 
         pL = g.get_list_regions43_fz()
-        p_list_notifications = g.go_to_the_catalogs(pL)
+        p_list_notifications = g.go_to_the_catalogs(pL,p_temp)
         print(len(p_list_notifications))
         #p_list_notifications = [{'дата_создания': '2021-12-10 15:15:52.030514', 'тип_фз': 'Электронный аукцион',
         #                     'дата_размещения': '2021-12-08T16:28:48.649+07:00',
@@ -569,19 +601,19 @@ def main(inner=False):
         #                         'объект_закупки': 'Подписка на периодические издания и услуги по доставке ',
         #                         'адрес_заказчика': 'Российская Федерация, 649000, Алтай Респ, Горно-Алтайск г, Ленкина ул, 4',
         #                         'заказчик': 'АРБИТРАЖНЫЙ СУД РЕСПУБЛИКИ АЛТАЙ', 'начальная_цена': '123510.69'}]
-        connection = pymysql.connect(host="94.228.121.182", user="phpmyadmin", passwd="g7A1PuDN", database="goszakupki")
+        connection = pymysql.connect(host=p_addressDB, user=p_loginDB, passwd=p_passDB, database=p_nameDB)
         for x in p_list_notifications:
             try:
                 cursor = connection.cursor()
                 niz = x["номер_извещения"]
-                sql = f"Select * from notifications where num_notification LIKE '{niz}'"
+                sql = f"Select * from {p_nametable} where num_notification LIKE '{niz}'"
                 cursor.execute(sql)
 
                 oneRow = cursor.fetchone()
 
                 if oneRow == None:
                     cursor = connection.cursor()
-                    sql = 'INSERT INTO notifications (date, fz, region, type_fz, ' \
+                    sql = f'INSERT INTO {p_nametable} (date, fz, region, type_fz, ' \
                           'date_publish, date_finish, num_notification, ref, ' \
                           'subject_purchase, customer, address_customer, price) ' \
                           'VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
@@ -591,10 +623,10 @@ def main(inner=False):
                     connection.commit()
             except:
                 connection.close()
-                with open(r'D:\trace.txt', 'a') as fp:
-                    traceback.print_exc(file=fp)
+                #with open(r'D:\trace.txt', 'a') as fp:
+                #    traceback.print_exc(file=fp)
                     # повторный вызов исключения, если это необходимо.
-                raise
+                #raise
                 break
 
         try:
@@ -654,9 +686,17 @@ def main(inner=False):
             print('Connected was closed!!!')
 
 if __name__ == "__main__":
-    #if len(sys.argv) <= 1:
-    #    print('Parameters are not specified!')
-    #else:
-    #    main(True)
-    for x in sys.argv:
-        print(f'{x} \n')
+    # Разбор параметров
+    # 1.FTP сайта госзакупок; 2.Логин; 3. Пароль; 4.FTP сайта госзакупок 223; 5.Логин 223; 6. Пароль 223; 7. Временный каталог для распаковки скачанных архивов
+    # 8. Каталог для xml; 9.Адрес БД; 10.Пользователь БД; 11.Пароль пользователя БД; 12.Имя БД; 13.Имя таблицы извещений
+
+    # ftp.zakupki.gov.ru free free ftp.zakupki.gov.ru fz223free fz223free C:\ftpload temp 94.228.121.182 phpmyadmin g7A1PuDN goszakupki
+    # notifications
+    if len(sys.argv) <= 1:
+        print('Parameters are not specified!')
+    elif len(sys.argv) == 2:
+        decryption_of_parameters()
+    else:
+        main(True)
+    #for x in sys.argv:
+    #    print(f'{x} \n')
