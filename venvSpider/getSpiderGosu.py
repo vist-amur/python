@@ -563,10 +563,12 @@ class FuncSpider:
 
         return total_list_to_sql
 
-def decryption_of_parameters(self):
+def decryption_of_parameters():
     print('Разбор параметров '
           '1.FTP сайта госзакупок; 2.Логин; 3. Пароль; 4.FTP сайта госзакупок 223; 5.Логин 223; 6. Пароль 223; 7. Временный каталог для распаковки скачанных архивов'
           '8. Каталог для xml; 9.Адрес БД; 10.Пользователь БД; 11.Пароль пользователя БД; 12.Имя БД; 13.Имя таблицы извещений)')
+    print(r'Пример: ftp.zakupki.gov.ru free free ftp.zakupki.gov.ru fz223free fz223free C:\ftpload temp 94.228.121.182 phpmyadmin pass goszakupki '
+          'notifications')
 
 def main(inner=False):
     # Разбор параметров
@@ -632,7 +634,8 @@ def main(inner=False):
         try:
             connection.close()
         except:
-            print('Connected was closed!')
+            # print('Connected was closed!')
+            pass
         del g
         del pL
         del p_list_notifications
@@ -683,7 +686,8 @@ def main(inner=False):
         try:
             connection.close()
         except:
-            print('Connected was closed!!!')
+            # print('Connected was closed!!!')
+            pass
 
 if __name__ == "__main__":
     # Разбор параметров
