@@ -364,7 +364,12 @@ class FuncSpider:
                 # with open(self.pCatalogLoad + r'\regions.txt', 'wb') as f:
                 for x in list_downloads:
                     with open(self.pCatalogLoad + fr'{p_slash}{x}', 'wb') as f:
-                        p_ftp.retrbinary(f"RETR {x}", f.write)
+                        try:
+                            p_ftp.retrbinary(f"RETR {x}", f.write)
+                        except Exception as details:
+                            print('Unexpected error: {0}'.format(details))
+
+
 
                 p_ftp.cwd(f'/out/published/{xcat}')
 
@@ -594,7 +599,7 @@ def main(inner=False):
 
         pL = g.get_list_regions43_fz()
         p_list_notifications = g.go_to_the_catalogs(pL,p_temp)
-        print(len(p_list_notifications))
+        print(str(datetime.now()) + ':' + len(p_list_notifications))
         #p_list_notifications = [{'дата_создания': '2021-12-10 15:15:52.030514', 'тип_фз': 'Электронный аукцион',
         #                     'дата_размещения': '2021-12-08T16:28:48.649+07:00',
         #                         'дата_окончания': '2021-12-16T23:59:00+07:00',
@@ -646,7 +651,7 @@ def main(inner=False):
 
         pL = g.get_list_regions223_fz()
         p_list_notifications = g.go_to_the_catalogs223fz(pL, g.get_list_catalog_regions223_fz(), p_temp)
-        print(len(p_list_notifications))
+        print(str(datetime.now()) + ':' + len(p_list_notifications))
         #p_list_notifications = [{'дата_создания': '2021-12-10 15:15:52.030514', 'тип_фз': 'Электронный аукцион',
         #                     'дата_размещения': '2021-12-08T16:28:48.649+07:00',
         #                         'дата_окончания': '2021-12-16T23:59:00+07:00',
