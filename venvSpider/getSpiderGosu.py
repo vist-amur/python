@@ -599,7 +599,7 @@ def main(inner=False):
 
         pL = g.get_list_regions43_fz()
         p_list_notifications = g.go_to_the_catalogs(pL,p_temp)
-        print(str(datetime.now()) + ':' + len(p_list_notifications))
+        print(str(datetime.now()) + ':' + str(len(p_list_notifications)))
         #p_list_notifications = [{'дата_создания': '2021-12-10 15:15:52.030514', 'тип_фз': 'Электронный аукцион',
         #                     'дата_размещения': '2021-12-08T16:28:48.649+07:00',
         #                         'дата_окончания': '2021-12-16T23:59:00+07:00',
@@ -651,7 +651,7 @@ def main(inner=False):
 
         pL = g.get_list_regions223_fz()
         p_list_notifications = g.go_to_the_catalogs223fz(pL, g.get_list_catalog_regions223_fz(), p_temp)
-        print(str(datetime.now()) + ':' + len(p_list_notifications))
+        print(str(datetime.now()) + ':' + str(len(p_list_notifications)))
         #p_list_notifications = [{'дата_создания': '2021-12-10 15:15:52.030514', 'тип_фз': 'Электронный аукцион',
         #                     'дата_размещения': '2021-12-08T16:28:48.649+07:00',
         #                         'дата_окончания': '2021-12-16T23:59:00+07:00',
