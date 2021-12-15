@@ -626,8 +626,8 @@ def main(inner=False):
                           'subject_purchase, customer, address_customer, price) ' \
                           'VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)'
                     cursor.execute(sql, (datetime.strptime(x["дата_создания"], '%Y-%m-%d %H:%M:%S.%f'), x["фз"], x["регион"], x["тип_фз"] , datetime.strptime(x["дата_размещения"][0:10], '%Y-%m-%d'), datetime.strptime(x["дата_окончания"][0:10], '%Y-%m-%d'),
-                                         x["номер_извещения"], x["ссылка_на_сайт"], x["объект_закупки"], x["адрес_заказчика"],
-                                         x["заказчик"], float(x["начальная_цена"])))
+                                         x["номер_извещения"], x["ссылка_на_сайт"], x["объект_закупки"], x["заказчик"], x["адрес_заказчика"],
+                                         float(x["начальная_цена"])))
                     connection.commit()
             except:
                 connection.close()
