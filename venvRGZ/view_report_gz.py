@@ -3,6 +3,7 @@ import streamlit as st
 from PIL import Image
 import pymysql
 import platform
+import sys
 
 def load_css(file_name:str):
     '''
@@ -56,10 +57,10 @@ def main():
     #SELECT * FROM `notifications` WHERE `date_publish` BETWEEN '2021-12-13' AND '2021-12-13'
     #AND `region` IN () AND `subject_purchase`LIKE ''
     cursor = connection.cursor()
-    sql = f"Select * from {p_nametable} where num_notification LIKE '{niz}'"
+    sql = f"Select * from {p_nametable} where num_notification LIKE date_publish BETWEEN {date_start[0]} AND {date_start[1]}"
     cursor.execute(sql)
 
-    oneRow = cursor.fetchone()
+    AllRow = cursor.fetchall()
 
     load_css(fr'{p_css}{p_slash}{p_name_css}')
 
