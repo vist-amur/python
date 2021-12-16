@@ -16,4 +16,3 @@ date_start = st.sidebar.date_input('Период размещения заяво
 like_words = st.sidebar.text_input('Ключевые фразы, указанные через запятую:')
 
 load_css(r'C:\Users\DNS\report_goszakupki\venvRGZ\style.css')
-#comment а
