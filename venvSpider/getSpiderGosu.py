@@ -198,13 +198,14 @@ class FuncSpider:
                         # finish
 
                         # tag endDT - start
-                        items = pdoc.getElementsByTagName(p_ntag + 'endDT')
+                        items = pdoc.getElementsByTagName(p_ntag + 'endDate')
                         if len(items) > 0:
                             for name_obj in items:
                                 nodes = name_obj.childNodes
                                 for node in nodes:
                                     if node.nodeType == node.TEXT_NODE:
                                         p_reg_list['дата_окончания'] = node.data
+                                break
 
                         if 'дата_окончания' not in p_reg_list:
                             items = pdoc.getElementsByTagName(p_ntag + 'endDate')
