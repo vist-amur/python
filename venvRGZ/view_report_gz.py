@@ -4,6 +4,11 @@ from PIL import Image
 import pymysql
 import platform
 import sys
+import plotly.express  as px
+import plotly.graph_objects as go
+from altair.vega import alignValue
+import pandas as pd
+
 
 def load_css(file_name:str):
     '''
@@ -16,8 +21,9 @@ def load_css(file_name:str):
 def decryption_of_parameters():
     print('Разбор параметров '
            '1.Адрес БД; 2.Пользователь БД; 3.Пароль пользователя БД; 4.Имя БД; 5.Имя таблицы извещений)')
-    print(r'Пример: 94.228.121.182 phpmyadmin pass goszakupki '
-          'notifications')
+    print(r'Пример: 94.228.121.182 phpmyadmin pass goszakupki notifications C:\Users\DNS\report_goszakupki\venvRGZ '
+          r'logo.png C:\Users\DNS\report_goszakupki\venvRGZ style.css')
+
 def get_region(p_key, p_status = False):
     dict_regions = {'Altaj_Resp': 'Республика Алтай',
                     'Altajskij_kraj': 'Алтайский край',
@@ -111,6 +117,13 @@ def get_region(p_key, p_status = False):
             return key
     return ""
 
+def tuple_to_Dataframe(p_tuple):
+    p_list = []
+    for x in p_tuple:
+        a = [y for y in x]
+        p_list.append(a)
+    return p_list
+
 def main():
     p_address = sys.argv[1]
     p_loginDB = sys.argv[2]
@@ -121,6 +134,7 @@ def main():
     p_name_logo = sys.argv[7]
     p_css = sys.argv[8]
     p_name_css = sys.argv[9]
+
 
 
     p_slash = ''
@@ -142,17 +156,19 @@ def main():
                    "initial_sidebar_state":"auto"}
 
     st.set_page_config(**PAGE_CONFIG)
-
+    table_contener = st.container()
+    table_contener_df = st.container()
     connection = pymysql.connect(host=p_address, user=p_loginDB, passwd=p_passDB, database=p_nameDB)
 
+    st.sidebar.markdown('## Фильтры')
     selected_regions = st.sidebar.multiselect("Регионы РФ", get_region('',True))
     date_start = st.sidebar.date_input('Период размещения заявок:',[datetime.datetime.now() - datetime.timedelta(1), datetime.datetime.now()])
     like_words = st.sidebar.text_input('Ключевые фразы объекта закупки, указанные через запятую:')
     list_like_words = like_words.split(',')
-    with st.echo():
-        st.write(selected_regions)
-    with st.echo():
-        st.write(list_like_words)
+    #with st.echo():
+    #    st.write(selected_regions)
+    #with st.echo():
+    #    st.write(list_like_words)
     sql_like_words = ''
     ind = 0
     if len(list_like_words) > 0:
@@ -181,17 +197,33 @@ def main():
     #SELECT * FROM `notifications` WHERE `date_publish` BETWEEN '2021-12-13' AND '2021-12-13'
     #AND `region` IN () AND `subject_purchase`LIKE ''
     cursor = connection.cursor()
-    sql = f"Select * from {p_nametable} where date_publish BETWEEN '{date_start[0]}' AND '{date_start[-1]}'{p_sql_regions_pre}{p_sql_regions}{sql_like_words}"
+    sql = f"Select date_publish,date_finish,fz,type_fz,region,num_notification,price,subject_purchase,customer, address_customer, ref from {p_nametable} where date_publish BETWEEN '{date_start[0]}' AND '{date_start[-1]}'{p_sql_regions_pre}{p_sql_regions}{sql_like_words}" \
+          f" ORDER BY date_publish, region"
     cursor.execute(sql)
-    with st.echo():
-        st.write(sql)
+    #with st.echo():
+    #    st.write(sql)
 
-    AllRow = cursor.fetchmany(25)
+    AllRow = cursor.fetchall()
+    #st.dataframe()
+    #st.table(AllRow)
 
-    with st.echo():
-        st.write(AllRow)
+    #list_a = [['1', '2', '3'],
+    #          ['6', '7', '8']]
+    columns = ['Дата_публикации','Дата_окончания', 'ФЗ', 'Тип_закупки', 'Регион', 'Номер_извещения', 'Начальная_цена', 'Предмет_закупки', 'Заказчик', 'Адрес_заказчика', 'Ссылка']
+    df_a = pd.DataFrame(tuple_to_Dataframe(AllRow), columns=columns)
 
-    load_css(fr'{p_css}{p_slash}{p_name_css}')
+    #with table_contener:
+    #    fig = go.Figure(data=go.Table(
+    #                    header=dict(values=['Дата публикации','Дата окончания', 'ФЗ', 'Тип закупки', 'Регион', 'Номер извещения', 'Начальная цена', 'Предмет закупки', 'Заказчик', 'Адрес заказчика', 'Ссылка'], fill_color='#dde23e', align='center'),
+    #                    cells=dict(values=[df_a.Дата_публикации,df_a.Дата_окончания,df_a.ФЗ, df_a.Тип_закупки, df_a.Регион, df_a.Номер_извещения, df_a.Начальная_цена, df_a.Предмет_закупки, df_a.Заказчик, df_a.Адрес_заказчика, df_a.Ссылка],font = dict(color = 'darkslategray', size = 12))))
+
+    #    fig.update_layout(margin=dict(l=2,r=2, b=2, t=2))
+    #    st.write(fig)
+
+    with table_contener_df:
+       st.dataframe(df_a)
+
+    #load_css(fr'{p_css}{p_slash}{p_name_css}')
 
 
 if __name__ == "__main__":
