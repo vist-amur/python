@@ -197,8 +197,8 @@ class FuncSpider:
                             p_reg_list['дата_размещения'] = '1970-01-01'
                         # finish
 
-                        # tag endDT - start
-                        items = pdoc.getElementsByTagName(p_ntag + 'endDate')
+                        # tag endDT - finish
+                        items = pdoc.getElementsByTagName(p_ntag + 'endDT')
                         if len(items) > 0:
                             for name_obj in items:
                                 nodes = name_obj.childNodes
@@ -206,6 +206,15 @@ class FuncSpider:
                                     if node.nodeType == node.TEXT_NODE:
                                         p_reg_list['дата_окончания'] = node.data
                                 break
+
+                        if 'дата_окончания' not in p_reg_list:
+                            items = pdoc.getElementsByTagName('endDate')
+                            if len(items) > 0:
+                                for name_obj in items:
+                                    nodes = name_obj.childNodes
+                                    for node in nodes:
+                                        if node.nodeType == node.TEXT_NODE:
+                                            p_reg_list['дата_окончания'] = node.data
 
                         if 'дата_окончания' not in p_reg_list:
                             items = pdoc.getElementsByTagName(p_ntag + 'endDate')
