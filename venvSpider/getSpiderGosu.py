@@ -458,7 +458,7 @@ class FuncSpider:
                                 p_reg_list['дата_размещения'] = '1970-01-01'
                             # finish
 
-                            # tag endDT - start
+                            # tag endDT - finish
                             items = pdoc.getElementsByTagName(p_ntag + 'deliveryEndDateTime')
                             if len(items) > 0:
                                 for name_obj in items:
