@@ -140,17 +140,17 @@ app.layout = html.Div(
                 style={'padding-top': '3%'}
             ),
 
-           # html.Div([
-           #     html.Img(
-           #         src=app.get_asset_url('logo_001c.png'),
-           #         height='43 px',
-           #         width='auto')
-           # ],
-           #     className='col-2',
-           #     style={
-           #         'align-items': 'center',
-           #         'padding-top': '1%',
-           #         'height': 'auto'})
+            # html.Div([
+            #     html.Img(
+            #         src=app.get_asset_url('logo_001c.png'),
+            #         height='43 px',
+            #         width='auto')
+            # ],
+            #     className='col-2',
+            #     style={
+            #         'align-items': 'center',
+            #         'padding-top': '1%',
+            #         'height': 'auto'})
 
         ],
             className='row',
@@ -213,6 +213,22 @@ app.layout = html.Div(
                                   style={"width": "100%", 'font-size': '18px', 'border': '1px solid #ccc',
                                          'border-radius': '2px', 'border-spacing': '0'}
                               ),
+                              html.Div(
+                                  children="Закон",
+                                  id="text_fz", className="class-text-fz",
+                                  style={'font-size': '18px', 'color': '#0d3117'}),
+                              dcc.Dropdown(
+                                  id="fz-filter",
+                                  options=[
+                                      {"label": fz, "value": fz}
+                                      for fz in ['44-ФЗ', '223-ФЗ']
+                                  ],
+                                  value='44-ФЗ',
+                                  clearable=False,
+                                  className="dropdown",
+                                  multi=True,
+                              ),
+
                               ], style={"width": "50%", 'font-size': '12px'}, )
                 ),
 
@@ -293,12 +309,13 @@ app.layout = html.Div(
     [Output("table", "data")],
     [
         Input("region-filter", "value"),
+        Input("fz-filter", "value"),
         Input("input_words", "value"),
         Input("date-picker-sales", "start_date"),
         Input("date-picker-sales", "end_date"),
     ],
 )
-def update_table(region, words, start_date, end_date):
+def update_table(region, fz, words, start_date, end_date):
     sql_like_words = ''
     ind = 0
     p_words = words.strip()
@@ -321,6 +338,17 @@ def update_table(region, words, start_date, end_date):
     else:
         p_sql_regions = ""
         p_sql_regions_pre = ""
+
+    p_sql_type_fz_pre = " AND fz IN ("
+    if len(fz) > 0:
+        sql_type_fz = [f"\'{x}\'" for x in fz]
+        if isinstance(fz, str):
+            p_sql_type_fz = f"\'{fz}\')"
+        else:
+            p_sql_type_fz = ",".join(sql_type_fz) + ')'
+    else:
+        p_sql_type_fz = ""
+        p_sql_type_fz_pre = ""
     try:
         connection = mysql.connect(host="37.77.105.58", user="phpmyadmin", passwd="g7A1PuDN", database="goszakupki")
     except:
@@ -329,7 +357,7 @@ def update_table(region, words, start_date, end_date):
 
     p_nametable = 'notifications'
     cursor = connection.cursor()
-    sql = f"Select date_publish,date_finish,fz,type_fz,region,num_notification,price,subject_purchase,customer, address_customer, ref from {p_nametable} where date_publish BETWEEN '{start_date}' AND '{end_date}'{p_sql_regions_pre}{p_sql_regions}{sql_like_words}" \
+    sql = f"Select date_publish,date_finish,fz,type_fz,region,num_notification,price,subject_purchase,customer, address_customer, ref from {p_nametable} where date_publish BETWEEN '{start_date}' AND '{end_date}'{p_sql_regions_pre}{p_sql_regions}{p_sql_type_fz_pre}{p_sql_type_fz}{sql_like_words}" \
           f" ORDER BY date_publish, region"
     cursor.execute(sql)
     # with st.echo():
@@ -352,7 +380,8 @@ def input_triggers_spinner(value):
     # time.sleep(1)
     return value
 
+
 server = app.server
 
 if __name__ == '__main__':
-    application.run(debug=True)
+    server.run(debug=True)
