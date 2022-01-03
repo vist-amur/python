@@ -9,7 +9,7 @@ import pymysql
 import traceback
 import platform
 
-
+# 03012022
 class FuncSpider:
     def __init__(self, p_location, p_login, p_pass, p_catalog_load):
         self.pLocation = p_location
