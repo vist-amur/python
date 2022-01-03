@@ -12,6 +12,7 @@ from dash.dependencies import Input, Output
 data_tooltip = {}
 num_progress = 0
 
+
 def tuple_to_dataframe(p_tuple):
     p_list = []
     for x in p_tuple:
@@ -121,8 +122,8 @@ def get_region(p_key, p_status=False):
 
 
 def get_region_all(p_key):
-    dict_regions = {'Республика Адыгея': ['Adygeja_Resp','Adygeya_Resp'],
-                    'Республика Алтай': ['Altaj_Resp','Altay_Resp'],
+    dict_regions = {'Республика Адыгея': ['Adygeja_Resp', 'Adygeya_Resp'],
+                    'Республика Алтай': ['Altaj_Resp', 'Altay_Resp'],
                     'Алтайский край': ['Altajskij_kraj', 'Altayskii__krai'],
                     'Амурская область': ['Amurskaja_obl', 'Amurskaya_obl'],
                     'Архангельская область': ['Arkhangelskaja_obl', 'Arhangelskaya_obl'],
@@ -139,7 +140,8 @@ def get_region_all(p_key):
                     'Республика Дагестан': ['Dagestan_Resp', 'Dagestan_Resp'],
                     'Еврейская автономная область': ['Evrejskaja_Aobl', 'Evreiskaya_Aobl'],
                     'Республика Ингушетия': ['Ingushetija_Resp', 'Ingushetiya_Resp'],
-                    'Иркутская область': ['Irkutskaja_obl', 'Irkutskaya_obl', 'Irkutskaya_obl_Ust-Ordynskii_Buriatskii_okrug'],
+                    'Иркутская область': ['Irkutskaja_obl', 'Irkutskaya_obl',
+                                          'Irkutskaya_obl_Ust-Ordynskii_Buriatskii_okrug'],
                     'Ивановская область': ['Ivanovskaja_obl', 'Ivanowskaya_obl'],
                     'Ямало-Ненецкий автономный округ': ['Jamalo-Neneckij_AO', 'Jamalo-Nenetckii_AO'],
                     'Ярославская область': ['Jaroslavskaja_obl', 'Jaroslavskaya_obl'],
@@ -153,7 +155,8 @@ def get_region_all(p_key):
                     'Кемеровская область': ['Kemerovskaja_obl', 'Kemerowskaya_obl'],
                     'Хабаровский край': ['Khabarovskij_kraj', 'Habarovskii_krai'],
                     'Республика Хакасия': ['Khakasija_Resp', 'Hakasiia_Resp'],
-                    'Ханты-Мансийский автономный округ — Югра': ['Khanty-Mansijskij_AO-Jugra_AO', 'Hanty-Mansiiskii_AO_Iugra_AO'],
+                    'Ханты-Мансийский автономный округ — Югра': ['Khanty-Mansijskij_AO-Jugra_AO',
+                                                                 'Hanty-Mansiiskii_AO_Iugra_AO'],
                     'Кировская область': ['Kirovskaja_obl', 'Kirowskaya_obl'],
                     'Республика Коми': ['Komi_Resp', 'Komi_Resp'],
                     'Костромская область': ['Kostromskaja_obl', 'Kostromskaya_obl'],
@@ -189,7 +192,8 @@ def get_region_all(p_key):
                     'Санкт-Петербург': ['Sankt-Peterburg', 'Sankt-Peterburg'],
                     'Саратовская область': ['Saratovskaja_obl', 'Saratovskaya_obl'],
                     'Севастополь': ['Sevastopol_g', 'Sevastopol'],
-                    'Республика Северная Осетия — Алания': ['Severnaja_Osetija-Alanija_Resp', 'Severnaia_Osetiya_Alaniia_Resp'],
+                    'Республика Северная Осетия — Алания': ['Severnaja_Osetija-Alanija_Resp',
+                                                            'Severnaia_Osetiya_Alaniia_Resp'],
                     'Смоленская область': ['Smolenskaja_obl', 'Smolenskaya_obl'],
                     'Ставропольский край': ['Stavropolskij_kraj', 'Stavropolskii_krai'],
                     'Свердловская область': ['Sverdlovskaja_obl', 'Sverdlovskaya_obl'],
@@ -206,7 +210,8 @@ def get_region_all(p_key):
                     'Волгоградская область': ['Volgogradskaja_obl', 'Volgogradskaya_obl'],
                     'Вологодская область': ['Vologodskaja_obl', 'Vologodskaya_obl'],
                     'Воронежская область': ['Voronezhskaja_obl', 'Voronezhskaya_obl'],
-                    'Забайкальский край': ['Zabajkalskij_kraj', 'Zabaikalskii_krai', 'Zabaikalskii_krai_Aginskii_Buriatskii_okrug']}
+                    'Забайкальский край': ['Zabajkalskij_kraj', 'Zabaikalskii_krai',
+                                           'Zabaikalskii_krai_Aginskii_Buriatskii_okrug']}
 
     for key, value in dict_regions.items():
         if key == p_key:
