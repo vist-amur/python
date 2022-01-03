@@ -241,9 +241,9 @@ def main():
 
     with table_contener_df:
         st.dataframe(df_a)
-    if st.button('Сохранить таблицу в csv файл'):
-        p_xls = df_a.to_excel("data_goszakupki.xlsx")
-        st.markdown(f'<a href="http://localhost:8501/data_goszakupki.xlsx">Download csv file</a>', unsafe_allow_html=True )
+    if st.button('Сохранить таблицу в Excel файл'):
+        p_xls = df_a.to_excel("/var/www/html/data_goszakupki.xlsx")
+        st.markdown(f'<a href="http://zimin.website/data_goszakupki.xlsx">Download csv file</a>', unsafe_allow_html=True )
     # load_css(fr'{p_css}{p_slash}{p_name_css}')
     #st.download_button('Download CSV', text_contents, 'text/csv')
     #with open('myfile.csv') as f:
