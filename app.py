@@ -1,6 +1,5 @@
 import sys
 from datetime import datetime, timedelta
-
 from dash import dash
 from dash import dash_table as dt
 import dash_bootstrap_components as dbc
