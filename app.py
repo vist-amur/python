@@ -1,7 +1,6 @@
 import sys
 from datetime import datetime, timedelta
-
-import dash
+from dash import dash
 from dash import dash_table as dt
 import dash_bootstrap_components as dbc
 from dash import html as html
@@ -120,6 +119,104 @@ def get_region(p_key, p_status=False):
         if value == p_key:
             return key
     return ""
+
+
+def get_region_all(p_key):
+    dict_regions = {'Республика Адыгея': ['Adygeja_Resp', 'Adygeya_Resp'],
+                    'Республика Алтай': ['Altaj_Resp', 'Altay_Resp'],
+                    'Алтайский край': ['Altajskij_kraj', 'Altayskii__krai'],
+                    'Амурская область': ['Amurskaja_obl', 'Amurskaya_obl'],
+                    'Архангельская область': ['Arkhangelskaja_obl', 'Arhangelskaya_obl'],
+                    'Астраханская область': ['Astrakhanskaja_obl', 'Astrahanskaya_obl'],
+                    'Байконур': ['Bajkonur_g', 'Baikonur_g'],
+                    'Республика Башкортостан': ['Bashkortostan_Resp', 'Bashkortostan_Resp'],
+                    'Белгородская область': ['Belgorodskaja_obl', 'Belgorodskaya_obl'],
+                    'Брянская область': ['Brjanskaja_obl', 'Brianskaya_obl'],
+                    'Республика Бурятия': ['Burjatija_Resp', 'Buryatiya_Resp'],
+                    'Чеченская Республика': ['Chechenskaja_Resp', 'Chechenskaya_Resp'],
+                    'Челябинская область': ['Cheljabinskaja_obl', 'Cheliabinskaya_obl'],
+                    'Чукотский автономный округ': ['Chukotskij_AO', 'Chukotskii_AO'],
+                    'Чувашская Республика-Чувашия': ['Chuvashskaja_Resp', 'Chuvashskaya_Respublika'],
+                    'Республика Дагестан': ['Dagestan_Resp', 'Dagestan_Resp'],
+                    'Еврейская автономная область': ['Evrejskaja_Aobl', 'Evreiskaya_Aobl'],
+                    'Республика Ингушетия': ['Ingushetija_Resp', 'Ingushetiya_Resp'],
+                    'Иркутская область': ['Irkutskaja_obl', 'Irkutskaya_obl',
+                                          'Irkutskaya_obl_Ust-Ordynskii_Buriatskii_okrug'],
+                    'Ивановская область': ['Ivanovskaja_obl', 'Ivanowskaya_obl'],
+                    'Ямало-Ненецкий автономный округ': ['Jamalo-Neneckij_AO', 'Jamalo-Nenetckii_AO'],
+                    'Ярославская область': ['Jaroslavskaja_obl', 'Jaroslavskaya_obl'],
+                    'Кабардино-Балкарская Республика': ['Kabardino-Balkarskaja_Resp', 'Kabardino-Balkarskaya_Resp'],
+                    'Калининградская область': ['Kaliningradskaja_obl', 'Kaliningradskaya_obl'],
+                    'Республика Калмыкия': ['Kalmykija_Resp', 'Kalmykiya_Resp'],
+                    'Калужская область': ['Kaluzhskaja_obl', 'Kaluzhskaya_obl'],
+                    'Камчатский край': ['Kamchatskij_kraj', 'Kamchatskii_krai'],
+                    'Карачаево-Черкесская Республика': ['Karachaevo-Cherkesskaja_Resp', 'Karachaevo-Cherkesskaya_Resp'],
+                    'Республика Карелия': ['Karelija_Resp', 'Kareliya_Resp'],
+                    'Кемеровская область': ['Kemerovskaja_obl', 'Kemerowskaya_obl'],
+                    'Хабаровский край': ['Khabarovskij_kraj', 'Habarovskii_krai'],
+                    'Республика Хакасия': ['Khakasija_Resp', 'Hakasiia_Resp'],
+                    'Ханты-Мансийский автономный округ — Югра': ['Khanty-Mansijskij_AO-Jugra_AO',
+                                                                 'Hanty-Mansiiskii_AO_Iugra_AO'],
+                    'Кировская область': ['Kirovskaja_obl', 'Kirowskaya_obl'],
+                    'Республика Коми': ['Komi_Resp', 'Komi_Resp'],
+                    'Костромская область': ['Kostromskaja_obl', 'Kostromskaya_obl'],
+                    'Краснодарский край': ['Krasnodarskij_kraj', 'Krasnodarskii_krai'],
+                    'Красноярский край': ['Krasnojarskij_kraj', 'Krasnoyarskii_krai'],
+                    'Республика Крым': ['Krim_Resp', 'Krym_Resp'],
+                    'Курганская область': ['Kurganskaja_obl', 'Kurganskaya_obl'],
+                    'Курская область': ['Kurskaja_obl', 'Kurskaya_obl'],
+                    'Ленинградская область': ['Leningradskaja_obl', 'Leningradskaya_obl'],
+                    'Липецкая область': ['Lipeckaja_obl', 'Lipetckaya_obl'],
+                    'Магаданская область': ['Magadanskaja_obl', 'Magadanskaya_obl'],
+                    'Республика Марий Эл': ['Marij_El_Resp', 'Marii_El_Resp'],
+                    'Республика Мордовия': ['Mordovija_Resp', 'Mordoviya_Resp'],
+                    'Московская область': ['Moskovskaja_obl', 'Moskovskaya_obl'],
+                    'Москва': ['Moskva', 'Moskva'],
+                    'Мурманская область': ['Murmanskaja_obl', 'Murmanskaya_obl'],
+                    'Ненецкий автономный округ': ['Neneckij_AO', 'Nenetckii_AO'],
+                    'Нижегородская область': ['Nizhegorodskaja_obl', 'Nizhegorodskaya_obl'],
+                    'Новгородская область': ['Novgorodskaja_obl', 'Novgorodskaya_obl'],
+                    'Новосибирская область': ['Novosibirskaja_obl', 'Novosibirskaya_obl'],
+                    'Омская область': ['Omskaja_obl', 'Omskaya_obl'],
+                    'Оренбургская область': ['Orenburgskaja_obl', 'Orenburgskaya_obl'],
+                    'Орловская область': ['Orlovskaja_obl', 'Orlovskaya_obl'],
+                    'Пензенская область': ['Penzenskaja_obl', 'Penzenskaya_obl'],
+                    'Пермский край': ['Permskij_kraj', 'Permskii_krai'],
+                    'Приморский край': ['Primorskij_kraj', 'Primorskii_krai'],
+                    'Псковская область': ['Pskovskaja_obl', 'Pskovskaya_obl'],
+                    'Рязанская область': ['Rjazanskaja_obl', 'Ryazanskaya_obl'],
+                    'Ростовская область': ['Rostovskaja_obl', 'Rostovskaya_obl'],
+                    'Республика Саха (Якутия)': ['Sakha_Jakutija_Resp', 'Saha_Jakutiya_Resp'],
+                    'Сахалинская область': ['Sakhalinskaja_obl', 'Sahalinskaya_obl'],
+                    'Самарская область': ['Samarskaja_obl', 'Samarskaya_obl'],
+                    'Санкт-Петербург': ['Sankt-Peterburg', 'Sankt-Peterburg'],
+                    'Саратовская область': ['Saratovskaja_obl', 'Saratovskaya_obl'],
+                    'Севастополь': ['Sevastopol_g', 'Sevastopol'],
+                    'Республика Северная Осетия — Алания': ['Severnaja_Osetija-Alanija_Resp',
+                                                            'Severnaia_Osetiya_Alaniia_Resp'],
+                    'Смоленская область': ['Smolenskaja_obl', 'Smolenskaya_obl'],
+                    'Ставропольский край': ['Stavropolskij_kraj', 'Stavropolskii_krai'],
+                    'Свердловская область': ['Sverdlovskaja_obl', 'Sverdlovskaya_obl'],
+                    'Тамбовская область': ['Tambovskaja_obl', 'Tambovskaya_obl'],
+                    'Республика Татарстан': ['Tatarstan_Resp', 'Tatarstan_Resp'],
+                    'Тюменская область': ['Tjumenskaja_obl', 'Tiumenskaya_obl'],
+                    'Томская область': ['Tomskaja_obl', 'Tomskaya_obl'],
+                    'Тульская область': ['Tulskaja_obl', 'Tulskaya_obl'],
+                    'Тверская область': ['Tverskaja_obl', 'Tverskaya_obl'],
+                    'Республика Тыва': ['Tyva_Resp', 'Tyva_Resp'],
+                    'Удмуртская Республика': ['Udmurtskaja_Resp', 'Udmurtskaya_Resp'],
+                    'Ульяновская область': ['Uljanovskaja_obl', 'Ulianovskaya_obl'],
+                    'Владимирская область': ['Vladimirskaja_obl', 'Vladimirskaya_obl'],
+                    'Волгоградская область': ['Volgogradskaja_obl', 'Volgogradskaya_obl'],
+                    'Вологодская область': ['Vologodskaja_obl', 'Vologodskaya_obl'],
+                    'Воронежская область': ['Voronezhskaja_obl', 'Voronezhskaya_obl'],
+                    'Забайкальский край': ['Zabajkalskij_kraj', 'Zabaikalskii_krai',
+                                           'Zabaikalskii_krai_Aginskii_Buriatskii_okrug']}
+
+    for key, value in dict_regions.items():
+        if key == p_key:
+            return key
+    return []
 
 
 standard_BS = dbc.themes.BOOTSTRAP
