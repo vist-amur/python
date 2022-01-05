@@ -215,7 +215,7 @@ def get_region_all(p_key):
 
     for key, value in dict_regions.items():
         if key == p_key:
-            return key
+            return value
     return []
 
 
@@ -430,8 +430,14 @@ def update_table(region, fz, words, start_date, end_date):
             sql_like_words = ''
     p_sql_regions_pre = " AND region IN ("
     if len(region) > 0:
-        sql_regions = [f"\'{get_region(x)}\'" for x in region if get_region(x) != "" f"'{get_region(x)}'"]
-        p_sql_regions = ",".join(sql_regions) + ')'
+        # sql_regions = [f"\'{get_region(x)}\'" for x in region if get_region(x) != "" f"'{get_region(x)}'"]
+        sql_regions = [get_region_all(x) for x in region]
+        p_temp = ''
+        for xobl in sql_regions:
+            for xel in xobl:
+                p_temp = p_temp + ",\'" + xel + "\'"
+
+        p_sql_regions = p_temp[1:-1] + "\')"
     else:
         p_sql_regions = ""
         p_sql_regions_pre = ""
