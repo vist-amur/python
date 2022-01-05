@@ -114,7 +114,8 @@ def get_region(p_key, p_status=False):
                     'Voronezhskaja_obl': 'Воронежская область',
                     'Zabajkalskij_kraj': 'Забайкальский край'}
     if p_status:
-        return dict_regions.values()
+        p_L = sorted(dict_regions.values())
+        return p_L
     for key, value in dict_regions.items():
         if value == p_key:
             return key
