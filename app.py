@@ -224,10 +224,10 @@ standard_BS = dbc.themes.BOOTSTRAP
 app = dash.Dash(__name__, external_stylesheets=[standard_BS])
 df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/solar.csv')
 df_gl = pd.DataFrame
+app.title = 'Веди - Госзакупки'
 app.layout = html.Div(
     [
         dbc.Row(html.Div([
-
             html.Div([], className='col-2'),
 
             html.Div([
